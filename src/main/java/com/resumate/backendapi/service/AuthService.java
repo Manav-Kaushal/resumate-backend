@@ -3,6 +3,7 @@ package com.resumate.backendapi.service;
 import com.resumate.backendapi.document.User;
 import com.resumate.backendapi.dto.AuthResponse;
 import com.resumate.backendapi.dto.RegisterRequest;
+import com.resumate.backendapi.exception.ResourceExistsException;
 import com.resumate.backendapi.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -21,7 +22,7 @@ public class AuthService {
         log.info("Inside AuthService: register() {} ", request);
 
         if(userRepository.existsByEmail(request.getEmail())){
-            throw new RuntimeException("User already exists with this email");
+            throw new ResourceExistsException("User already exists with this email");
         }
 
         User newUser = toDocument(request);

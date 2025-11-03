@@ -14,9 +14,9 @@ import java.util.Map;
 public class GlobalExceptionHandler {
 
     @ExceptionHandler(MethodArgumentNotValidException.class)
-    public ResponseEntity<Map<String, Object>> handleValidationExceptions(MethodArgumentNotValidException e) {
+    public ResponseEntity<Map<String, Object>> handleValidationExceptions(MethodArgumentNotValidException ex) {
         Map<String, String> errors = new HashMap<>();
-        e.getBindingResult().getAllErrors().forEach(error -> {
+        ex.getBindingResult().getAllErrors().forEach(error -> {
             String fieldName = ((FieldError)error).getField();
             String errorMessage = error.getDefaultMessage();
             errors.put(fieldName, errorMessage);
@@ -27,5 +27,25 @@ public class GlobalExceptionHandler {
         response.put("errors", errors);
 
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(response);
+    }
+
+    @ExceptionHandler(ResourceExistsException.class)
+    public ResponseEntity<Map<String, Object>> handleResourceExistsException(ResourceExistsException ex) {
+        Map<String, Object> response = new HashMap<>();
+        response.put("message", "Resource exists");
+        response.put("status", HttpStatus.CONFLICT);
+        response.put("errors", ex.getMessage());
+
+        return ResponseEntity.status(HttpStatus.CONFLICT).body(response);
+    }
+
+    @ExceptionHandler(Exception.class)
+    public ResponseEntity<Map<String, Object>> handleGenericException(Exception ex) {
+        Map<String, Object> response = new HashMap<>();
+        response.put("message", "Something went wrong. Contact administrator.");
+        response.put("errors", ex.getMessage());
+
+        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(response);
+
     }
 }
